@@ -23,7 +23,7 @@ public class LoanController {
         return ResponseEntity.ok(loanService.getAllLoans());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{loanId}")
     public ResponseEntity<LoanResponse> getLoan(@PathVariable UUID loanId) {
         return ResponseEntity.ok(loanService.getLoan(loanId));
     }
@@ -33,7 +33,7 @@ public class LoanController {
         return ResponseEntity.status(HttpStatus.CREATED).body(loanService.createLoan(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{loanId}")
     public ResponseEntity<LoanResponse> updateLoan(
             @PathVariable UUID loanId,
             @RequestBody UpdateLoanRequest request
@@ -41,7 +41,7 @@ public class LoanController {
         return ResponseEntity.ok(loanService.updateLoan(loanId, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{loanId}")
     public ResponseEntity<?> deleteLoan(@PathVariable UUID loanId) {
         loanService.deleteLoan(loanId);
         return ResponseEntity.noContent().build();

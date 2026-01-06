@@ -23,7 +23,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.getAllBooks());
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/{bookId}")
     public ResponseEntity<BookResponse> getBook(@PathVariable UUID bookId) {
         return ResponseEntity.ok(bookService.getBook(bookId));
     }
@@ -33,7 +33,7 @@ public class BookController {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
     }
 
-    @PutMapping("/{id}")
+    @PutMapping("/{bookId}")
     public ResponseEntity<BookResponse> updateBook(
             @PathVariable UUID bookId,
             @RequestBody UpdateBookRequest request
@@ -41,7 +41,7 @@ public class BookController {
         return ResponseEntity.ok(bookService.updateBook(bookId, request));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{bookId}")
     public ResponseEntity<?> deleteBook(@PathVariable UUID bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
