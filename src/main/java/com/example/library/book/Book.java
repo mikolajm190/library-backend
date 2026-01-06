@@ -26,7 +26,7 @@ public class Book {
     private String title;
 
     @Column(nullable = false)
-    private String name;
+    private String author;
 
     private int availableCopies;
     private int copiesOnLoan;
