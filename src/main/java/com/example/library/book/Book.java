@@ -15,7 +15,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table
+@Table(name = "book")
 public class Book {
 
     @Id
@@ -28,9 +28,12 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
+    @Column(nullable = false)
     private int availableCopies;
+
+    @Column(nullable = false)
     private int copiesOnLoan;
 
-    @OneToMany(mappedBy = "book")
+    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Loan> loans;
 }

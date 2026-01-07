@@ -28,6 +28,6 @@ public class User {
     @Column(nullable = false, unique = true)
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private Set<Loan> loans;
 }

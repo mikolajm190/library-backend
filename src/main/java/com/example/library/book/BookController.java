@@ -3,6 +3,9 @@ package com.example.library.book;
 import com.example.library.book.dto.BookResponse;
 import com.example.library.book.dto.CreateBookRequest;
 import com.example.library.book.dto.UpdateBookRequest;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,8 +22,13 @@ public class BookController {
     private final BookService bookService;
 
     @GetMapping
-    public ResponseEntity<List<BookResponse>> getAllBooks() {
-        return ResponseEntity.ok(bookService.getAllBooks());
+    public ResponseEntity<List<BookResponse>> getAllBooks(
+            @RequestParam(defaultValue = "0") @Min(0) int page,
+            @RequestParam(defaultValue = "10") @Min(1) int size,
+            @RequestParam(defaultValue = "title") @Pattern(regexp = "title") String sortBy,
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) String sortOrder
+    ) {
+        return ResponseEntity.ok(bookService.getAllBooks(page, size, sortBy, sortOrder));
     }
 
     @GetMapping("/{bookId}")
@@ -29,14 +37,14 @@ public class BookController {
     }
 
     @PostMapping
-    public ResponseEntity<BookResponse> createBook(@RequestBody CreateBookRequest request) {
+    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody CreateBookRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
     }
 
     @PutMapping("/{bookId}")
     public ResponseEntity<BookResponse> updateBook(
             @PathVariable UUID bookId,
-            @RequestBody UpdateBookRequest request
+            @Valid @RequestBody UpdateBookRequest request
     ) {
         return ResponseEntity.ok(bookService.updateBook(bookId, request));
     }

@@ -9,6 +9,9 @@ import com.example.library.user.User;
 import com.example.library.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,9 +27,11 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final LoanMapper mapper;
 
-    public List<LoanResponse> getAllLoans() {
+    public List<LoanResponse> getAllLoans(int page, int size, String sortBy, String sortOrder) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return loanRepository
-                .findAll()
+                .findAll(pageable)
                 .stream()
                 .map(mapper::toDto)
                 .toList();
@@ -68,6 +73,8 @@ public class LoanService {
     }
 
     public void deleteLoan(final UUID loanId) {
+        loanRepository.findById(loanId)
+                        .orElseThrow(EntityNotFoundException::new);
         loanRepository.deleteById(loanId);
     }
 }

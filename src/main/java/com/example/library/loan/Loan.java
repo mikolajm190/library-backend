@@ -16,7 +16,7 @@ import java.util.UUID;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table
+@Table(name = "loan")
 public class Loan {
 
     @Id
@@ -30,8 +30,10 @@ public class Loan {
     private LocalDateTime returnDate;
 
     @ManyToOne
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
     @ManyToOne
+    @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 }

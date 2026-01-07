@@ -4,6 +4,9 @@ import com.example.library.user.dto.CreateUpdateUserRequest;
 import com.example.library.user.dto.UserResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -16,9 +19,11 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper mapper;
 
-    public List<UserResponse> getAllUsers() {
+    public List<UserResponse> getAllUsers(int page, int size, String sortBy, String sortOrder) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
         return userRepository
-                .findAll()
+                .findAll(pageable)
                 .stream()
                 .map(mapper::toDto)
                 .toList();
@@ -52,6 +57,8 @@ public class UserService {
     }
 
     public void deleteUser(final UUID userId) {
+        userRepository.findById(userId)
+                        .orElseThrow(EntityNotFoundException::new);
         userRepository.deleteById(userId);
     }
 }
