@@ -3,10 +3,7 @@ package com.example.library.loan;
 import com.example.library.book.Book;
 import com.example.library.user.User;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.UUID;
@@ -31,9 +28,13 @@ public class Loan {
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "book_id", nullable = false)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Book book;
 }
