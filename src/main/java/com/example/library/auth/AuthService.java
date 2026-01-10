@@ -3,7 +3,7 @@ package com.example.library.auth;
 import com.example.library.auth.dto.AuthenticationRequest;
 import com.example.library.auth.dto.AuthenticationResponse;
 import com.example.library.auth.dto.RegisterRequest;
-import com.example.library.config.JwtService;
+import com.example.library.security.JwtService;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
 import com.example.library.user.constants.Role;
