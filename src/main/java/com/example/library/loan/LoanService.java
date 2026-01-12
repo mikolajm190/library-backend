@@ -13,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -53,12 +54,21 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
+    @Transactional
     public LoanResponse createLoan(CreateLoanRequest request) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         User user = userRepository.findById(request.userId())
                 .orElseThrow(EntityNotFoundException::new);
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(EntityNotFoundException::new);
+
+        final int bookAvailableCopies = book.getAvailableCopies();
+        if (bookAvailableCopies == 0) {
+            throw new IllegalStateException("Book is currently unavailable");
+        }
+
+        book.setAvailableCopies(bookAvailableCopies - 1);
+        bookRepository.save(book);
 
         Loan loan = Loan.builder()
                 .borrowDate(currentDateTime)
