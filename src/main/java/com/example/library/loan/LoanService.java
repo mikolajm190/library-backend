@@ -37,6 +37,16 @@ public class LoanService {
                 .toList();
     }
 
+    public List<LoanResponse> getAllLoans(int page, int size, String sortBy, String sortOrder, final UUID userId) {
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Pageable pageable = PageRequest.of(page, size, sort);
+        return loanRepository
+                .findAllByUserId(userId, pageable)
+                .stream()
+                .map(mapper::toDto)
+                .toList();
+    }
+
     public LoanResponse getLoan(final UUID loanId) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(EntityNotFoundException::new);
@@ -62,11 +72,10 @@ public class LoanService {
     }
 
     public LoanResponse updateLoan(final UUID loanId, UpdateLoanRequest request) {
-        LocalDateTime currentDateTime = LocalDateTime.now();
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(EntityNotFoundException::new);
 
-        loan.setReturnDate(currentDateTime.plusDays(request.daysToProlong()));
+        loan.setReturnDate(loan.getReturnDate().plusDays(request.daysToProlong()));
 
         loanRepository.save(loan);
         return mapper.toDto(loan);
