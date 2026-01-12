@@ -68,6 +68,7 @@ public class LoanService {
         }
 
         book.setAvailableCopies(bookAvailableCopies - 1);
+        book.setCopiesOnLoan(book.getCopiesOnLoan() + 1);
         bookRepository.save(book);
 
         Loan loan = Loan.builder()
@@ -91,9 +92,16 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
+    @Transactional
     public void deleteLoan(final UUID loanId) {
-        loanRepository.findById(loanId)
+        Loan loan = loanRepository.findById(loanId)
                         .orElseThrow(EntityNotFoundException::new);
+        Book book = bookRepository.findById(loan.getBook().getId())
+                        .orElseThrow(EntityNotFoundException::new);
+
         loanRepository.deleteById(loanId);
+        book.setAvailableCopies(book.getAvailableCopies() + 1);
+        book.setCopiesOnLoan(book.getCopiesOnLoan() - 1);
+        bookRepository.save(book);
     }
 }

@@ -15,6 +15,7 @@ import java.util.UUID;
 @Entity
 @Table(name = "book")
 @Check(constraints = "available_copies >= 0")
+@Check(constraints = "copies_on_loan >= 0")
 public class Book {
 
     @Id

@@ -38,7 +38,7 @@ public class BookController {
     }
 
     @PostMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody CreateBookRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
     }
