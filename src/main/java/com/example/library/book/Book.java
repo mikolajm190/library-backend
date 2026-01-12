@@ -3,6 +3,7 @@ package com.example.library.book;
 import com.example.library.loan.Loan;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.Check;
 
 import java.util.Set;
 import java.util.UUID;
@@ -13,6 +14,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "book")
+@Check(constraints = "available_copies >= 0")
 public class Book {
 
     @Id
