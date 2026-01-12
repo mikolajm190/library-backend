@@ -9,6 +9,7 @@ import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -37,11 +38,13 @@ public class BookController {
     }
 
     @PostMapping
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookResponse> createBook(@Valid @RequestBody CreateBookRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
     }
 
     @PutMapping("/{bookId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookResponse> updateBook(
             @PathVariable UUID bookId,
             @Valid @RequestBody UpdateBookRequest request
@@ -50,6 +53,7 @@ public class BookController {
     }
 
     @DeleteMapping("/{bookId}")
+    @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteBook(@PathVariable UUID bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();

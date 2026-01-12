@@ -1,11 +1,12 @@
 package com.example.library.loan.dto;
 
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.util.UUID;
 
 public record CreateLoanRequest(
-        @NotNull
+        @NotBlank
         UUID userId,
 
         @NotNull
