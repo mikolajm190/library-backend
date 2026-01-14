@@ -9,4 +9,9 @@ import java.util.UUID;
 public interface LoanRepository extends JpaRepository<Loan, UUID> {
 
     List<Loan> findAllByUserId(UUID userId, Pageable pageable);
+
+    void deleteByUserId(UUID userId);
+    void deleteByBookId(UUID bookId);
+
+    boolean existsByBookIdAndUserId(UUID bookId, UUID userId);
 }

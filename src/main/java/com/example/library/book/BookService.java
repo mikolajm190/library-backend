@@ -3,12 +3,15 @@ package com.example.library.book;
 import com.example.library.book.dto.BookResponse;
 import com.example.library.book.dto.CreateBookRequest;
 import com.example.library.book.dto.UpdateBookRequest;
+import com.example.library.loan.Loan;
+import com.example.library.loan.LoanRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +21,7 @@ import java.util.UUID;
 public class BookService {
 
     private final BookRepository bookRepository;
+    private final LoanRepository loanRepository;
     private final BookMapper mapper;
 
     public List<BookResponse> getAllBooks(int page, int size, String sortBy, String sortOrder) {
@@ -58,9 +62,12 @@ public class BookService {
         return mapper.toDto(book);
     }
 
+    @Transactional
     public void deleteBook(final UUID bookId) {
-        bookRepository.findById(bookId)
-                        .orElseThrow(EntityNotFoundException::new);
+        if (!bookRepository.existsById(bookId)) {
+            throw new EntityNotFoundException("Resource not found");
+        }
+        loanRepository.deleteByBookId(bookId);
         bookRepository.deleteById(bookId);
     }
 }

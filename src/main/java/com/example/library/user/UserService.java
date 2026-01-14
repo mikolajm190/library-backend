@@ -1,5 +1,7 @@
 package com.example.library.user;
 
+import com.example.library.book.BookRepository;
+import com.example.library.loan.LoanRepository;
 import com.example.library.user.constants.Role;
 import com.example.library.user.dto.CreateUpdateUserRequest;
 import com.example.library.user.dto.UserResponse;
@@ -10,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.UUID;
@@ -19,6 +22,8 @@ import java.util.UUID;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final LoanRepository loanRepository;
+    private final BookRepository bookRepository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -60,9 +65,13 @@ public class UserService {
         return mapper.toDto(user);
     }
 
+    @Transactional
     public void deleteUser(final UUID userId) {
-        userRepository.findById(userId)
-                        .orElseThrow(EntityNotFoundException::new);
+        if (!userRepository.existsById(userId)) {
+            throw new EntityNotFoundException("Resource not found");
+        }
+        bookRepository.updateCountersOnReturn(userId);
+        loanRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

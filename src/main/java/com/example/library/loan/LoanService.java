@@ -67,6 +67,10 @@ public class LoanService {
             throw new IllegalStateException("Book is currently unavailable");
         }
 
+        if (loanRepository.existsByBookIdAndUserId(book.getId(), user.getId())) {
+            throw new IllegalStateException("You have this book on loan");
+        }
+
         book.setAvailableCopies(bookAvailableCopies - 1);
         book.setCopiesOnLoan(book.getCopiesOnLoan() + 1);
         bookRepository.save(book);

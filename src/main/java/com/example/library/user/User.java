@@ -31,7 +31,7 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String password;
 
-    @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "user")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Loan> loans;

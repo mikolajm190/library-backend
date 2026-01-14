@@ -34,7 +34,7 @@ public class Book {
     @Column(nullable = false)
     private int copiesOnLoan;
 
-    @OneToMany(mappedBy = "book", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    @OneToMany(mappedBy = "book")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Loan> loans;
