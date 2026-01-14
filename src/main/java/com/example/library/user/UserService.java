@@ -27,7 +27,7 @@ public class UserService {
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
-    public List<UserResponse> getAllUsers(int page, int size, String sortBy, String sortOrder) {
+    public List<UserResponse> getAllUsers(final int page, final int size, final String sortBy, final String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return userRepository
@@ -43,7 +43,7 @@ public class UserService {
         return mapper.toDto(user);
     }
 
-    public UserResponse createUser(CreateUpdateUserRequest request) {
+    public UserResponse createUser(final CreateUpdateUserRequest request) {
         User user = User.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
@@ -54,7 +54,7 @@ public class UserService {
         return mapper.toDto(user);
     }
 
-    public UserResponse updateUser(final UUID userId, CreateUpdateUserRequest request) {
+    public UserResponse updateUser(final UUID userId, final CreateUpdateUserRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(EntityNotFoundException::new);
 

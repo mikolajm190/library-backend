@@ -24,7 +24,7 @@ public class BookService {
     private final LoanRepository loanRepository;
     private final BookMapper mapper;
 
-    public List<BookResponse> getAllBooks(int page, int size, String sortBy, String sortOrder) {
+    public List<BookResponse> getAllBooks(final int page, final int size, final String sortBy, final String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return bookRepository
@@ -40,7 +40,7 @@ public class BookService {
         return mapper.toDto(book);
     }
 
-    public BookResponse createBook(CreateBookRequest request) {
+    public BookResponse createBook(final CreateBookRequest request) {
         Book book = Book.builder()
                 .title(request.title())
                 .author(request.author())
@@ -51,7 +51,7 @@ public class BookService {
         return mapper.toDto(book);
     }
 
-    public BookResponse updateBook(final UUID bookId, UpdateBookRequest request) {
+    public BookResponse updateBook(final UUID bookId, final UpdateBookRequest request) {
         Book book = bookRepository.findById(bookId)
                 .orElseThrow(EntityNotFoundException::new);
 

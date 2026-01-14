@@ -23,7 +23,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
-    public AuthenticationResponse register(RegisterRequest request) {
+    public AuthenticationResponse register(final RegisterRequest request) {
         User user = User.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
@@ -35,7 +35,7 @@ public class AuthService {
     }
 
 
-    public AuthenticationResponse login(AuthenticationRequest request) {
+    public AuthenticationResponse login(final AuthenticationRequest request) {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.username(),

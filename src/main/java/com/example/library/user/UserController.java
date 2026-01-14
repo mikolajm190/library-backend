@@ -25,44 +25,44 @@ public class UserController {
     @GetMapping
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<List<UserResponse>> getAllUsers(
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "10") @Min(1) int size,
-            @RequestParam(defaultValue = "username") @Pattern(regexp = "username") String sortBy,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) String sortOrder
+            @RequestParam(defaultValue = "0") @Min(0) final int page,
+            @RequestParam(defaultValue = "10") @Min(1) final int size,
+            @RequestParam(defaultValue = "username") @Pattern(regexp = "username") final String sortBy,
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder
     ) {
         return ResponseEntity.ok(userService.getAllUsers(page, size, sortBy, sortOrder));
     }
 
     @GetMapping("/me")
-    public ResponseEntity<UserResponse> getCurrentUser(Authentication authentication) {
+    public ResponseEntity<UserResponse> getCurrentUser(final Authentication authentication) {
         User currentUser = (User) authentication.getPrincipal();
         return ResponseEntity.ok(userService.getUser(currentUser.getId()));
     }
 
     @GetMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or @ownership.isProfileOwner(principal, #userId)")
-    public ResponseEntity<UserResponse> getUser(@PathVariable UUID userId) {
+    public ResponseEntity<UserResponse> getUser(@PathVariable final UUID userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody CreateUpdateUserRequest request) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody final CreateUpdateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
     @PutMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN') or @ownership.isProfileOwner(principal, #userId)")
     public ResponseEntity<UserResponse> updateUser(
-            @PathVariable UUID userId,
-            @Valid @RequestBody CreateUpdateUserRequest request
+            @PathVariable final UUID userId,
+            @Valid @RequestBody final CreateUpdateUserRequest request
     ) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }
 
     @DeleteMapping("/{userId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable UUID userId) {
+    public ResponseEntity<?> deleteUser(@PathVariable final UUID userId) {
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }

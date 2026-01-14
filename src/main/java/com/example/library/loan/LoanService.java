@@ -28,7 +28,7 @@ public class LoanService {
     private final BookRepository bookRepository;
     private final LoanMapper mapper;
 
-    public List<LoanResponse> getAllLoans(int page, int size, String sortBy, String sortOrder) {
+    public List<LoanResponse> getAllLoans(final int page, final int size, final String sortBy, final String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return loanRepository
@@ -38,7 +38,7 @@ public class LoanService {
                 .toList();
     }
 
-    public List<LoanResponse> getAllLoans(int page, int size, String sortBy, String sortOrder, final UUID userId) {
+    public List<LoanResponse> getAllLoans(final int page, final int size, final String sortBy, final String sortOrder, final UUID userId) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
         Pageable pageable = PageRequest.of(page, size, sort);
         return loanRepository
@@ -55,7 +55,7 @@ public class LoanService {
     }
 
     @Transactional
-    public LoanResponse createLoan(CreateLoanRequest request) {
+    public LoanResponse createLoan(final CreateLoanRequest request) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         User user = userRepository.findById(request.userId())
                 .orElseThrow(EntityNotFoundException::new);
@@ -86,7 +86,7 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
-    public LoanResponse updateLoan(final UUID loanId, UpdateLoanRequest request) {
+    public LoanResponse updateLoan(final UUID loanId, final UpdateLoanRequest request) {
         Loan loan = loanRepository.findById(loanId)
                 .orElseThrow(EntityNotFoundException::new);
 

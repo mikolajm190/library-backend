@@ -24,37 +24,37 @@ public class BookController {
 
     @GetMapping
     public ResponseEntity<List<BookResponse>> getAllBooks(
-            @RequestParam(defaultValue = "0") @Min(0) int page,
-            @RequestParam(defaultValue = "10") @Min(1) int size,
-            @RequestParam(defaultValue = "title") @Pattern(regexp = "title") String sortBy,
-            @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) String sortOrder
+            @RequestParam(defaultValue = "0") @Min(0) final int page,
+            @RequestParam(defaultValue = "10") @Min(1) final int size,
+            @RequestParam(defaultValue = "title") @Pattern(regexp = "title") final String sortBy,
+            @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder
     ) {
         return ResponseEntity.ok(bookService.getAllBooks(page, size, sortBy, sortOrder));
     }
 
     @GetMapping("/{bookId}")
-    public ResponseEntity<BookResponse> getBook(@PathVariable UUID bookId) {
+    public ResponseEntity<BookResponse> getBook(@PathVariable final UUID bookId) {
         return ResponseEntity.ok(bookService.getBook(bookId));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody CreateBookRequest request) {
+    public ResponseEntity<BookResponse> createBook(@Valid @RequestBody final CreateBookRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(bookService.createBook(request));
     }
 
     @PutMapping("/{bookId}")
     @PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<BookResponse> updateBook(
-            @PathVariable UUID bookId,
-            @Valid @RequestBody UpdateBookRequest request
+            @PathVariable final UUID bookId,
+            @Valid @RequestBody final UpdateBookRequest request
     ) {
         return ResponseEntity.ok(bookService.updateBook(bookId, request));
     }
 
     @DeleteMapping("/{bookId}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<?> deleteBook(@PathVariable UUID bookId) {
+    public ResponseEntity<?> deleteBook(@PathVariable final UUID bookId) {
         bookService.deleteBook(bookId);
         return ResponseEntity.noContent().build();
     }
