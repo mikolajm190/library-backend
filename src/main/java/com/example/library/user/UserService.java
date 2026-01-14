@@ -1,5 +1,6 @@
 package com.example.library.user;
 
+import com.example.library.user.constants.Role;
 import com.example.library.user.dto.CreateUpdateUserRequest;
 import com.example.library.user.dto.UserResponse;
 import jakarta.persistence.EntityNotFoundException;
@@ -7,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,7 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final UserMapper mapper;
+    private final PasswordEncoder passwordEncoder;
 
     public List<UserResponse> getAllUsers(int page, int size, String sortBy, String sortOrder) {
         Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
@@ -38,7 +41,8 @@ public class UserService {
     public UserResponse createUser(CreateUpdateUserRequest request) {
         User user = User.builder()
                 .username(request.username())
-                .password(request.password())
+                .password(passwordEncoder.encode(request.password()))
+                .role(Role.USER)
                 .build();
 
         userRepository.save(user);
@@ -50,7 +54,7 @@ public class UserService {
                 .orElseThrow(EntityNotFoundException::new);
 
         user.setUsername(request.username());
-        user.setPassword(request.password());
+        user.setPassword(passwordEncoder.encode(request.password()));
 
         userRepository.save(user);
         return mapper.toDto(user);
