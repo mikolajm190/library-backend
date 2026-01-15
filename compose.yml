@@ -1,0 +1,36 @@
+name: library-dev
+services:
+  db:
+    image: postgres:17
+    environment:
+      POSTGRES_DB: library
+      POSTGRES_USER: library
+      POSTGRES_PASSWORD: B00ks-are-great
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 5s
+    ports:
+      - "5432:5432"
+    volumes:
+      - library-dev-db:/var/lib/postgresql/data
+  api:
+    build:
+      context: .
+      dockerfile: Containerfile
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/library
+      SPRING_DATASOURCE_USERNAME: library
+      SPRING_DATASOURCE_PASSWORD: B00ks-are-great
+      JWT_SECRET: f89a377ba1d518eaab2dcc7b3e8fcdf0ab1881839cff5f1328e7e70fddafa98b
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  library-dev-db:
