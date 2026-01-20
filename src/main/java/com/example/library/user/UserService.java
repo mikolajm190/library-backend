@@ -1,6 +1,5 @@
 package com.example.library.user;
 
-import com.example.library.book.BookRepository;
 import com.example.library.loan.LoanRepository;
 import com.example.library.user.constants.Role;
 import com.example.library.user.dto.CreateUpdateUserRequest;
@@ -23,7 +22,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final LoanRepository loanRepository;
-    private final BookRepository bookRepository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -70,7 +68,6 @@ public class UserService {
         if (!userRepository.existsById(userId)) {
             throw new EntityNotFoundException("Resource not found");
         }
-        bookRepository.updateCountersOnReturn(userId);
         loanRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }

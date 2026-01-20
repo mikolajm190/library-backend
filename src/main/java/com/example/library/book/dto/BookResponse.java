@@ -6,7 +6,7 @@ public record BookResponse(
         UUID id,
         String title,
         String author,
-        int availableCopies,
-        int copiesOnLoan
+        int totalCopies,
+        int availableCopies
 ) {
 }

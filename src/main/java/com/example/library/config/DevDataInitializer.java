@@ -50,13 +50,11 @@ public class DevDataInitializer implements CommandLineRunner {
 
         List<Book> books = new ArrayList<>();
         for (int i = 0; i < 15; i++) {
-            int availableCopies = i < 2 ? 0 : 1;
-            int copiesOnLoan = availableCopies == 0 ? 1 : 0;
+            int totalCopies = i < 2 ? 3 : 1;
             Book book = Book.builder()
                     .title("Title" + i)
                     .author("Author" + i)
-                    .availableCopies(availableCopies)
-                    .copiesOnLoan(copiesOnLoan)
+                    .totalCopies(totalCopies)
                     .build();
             books.add(book);
         }
@@ -74,19 +72,19 @@ public class DevDataInitializer implements CommandLineRunner {
         Book book2 = bookRepository.findByTitle("Title1")
                 .orElseThrow(EntityNotFoundException::new);
 
-        LocalDateTime currentDateTime = LocalDateTime.now();
+        LocalDateTime currentDate = LocalDateTime.now();
         List<Loan> loans = List.of(
                 Loan.builder()
                         .user(user1)
                         .book(book1)
-                        .borrowDate(currentDateTime.minusMinutes(5).minusDays(15))
-                        .returnDate(currentDateTime.minusMinutes(5).minusDays(15).plusMonths(1))
+                        .borrowDate(currentDate.minusDays(15))
+                        .returnDate(currentDate.minusDays(15).plusMonths(1))
                         .build(),
                 Loan.builder()
                         .user(user2)
                         .book(book2)
-                        .borrowDate(currentDateTime.minusMinutes(15))
-                        .returnDate(currentDateTime.minusMinutes(15).plusMonths(1))
+                        .borrowDate(currentDate)
+                        .returnDate(currentDate.plusMonths(1))
                         .build()
         );
 

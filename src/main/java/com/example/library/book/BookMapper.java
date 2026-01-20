@@ -11,8 +11,8 @@ public class BookMapper {
                 book.getId(),
                 book.getTitle(),
                 book.getAuthor(),
-                book.getAvailableCopies(),
-                book.getCopiesOnLoan()
+                book.getTotalCopies(),
+                book.getAvailableCopies()
         );
     }
 }

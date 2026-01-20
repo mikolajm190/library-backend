@@ -13,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -54,7 +53,6 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
-    @Transactional
     public LoanResponse createLoan(final CreateLoanRequest request) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         User user = userRepository.findById(request.userId())
@@ -62,18 +60,13 @@ public class LoanService {
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        final int bookAvailableCopies = book.getAvailableCopies();
-        if (bookAvailableCopies == 0) {
+        if (book.getAvailableCopies() == 0) {
             throw new IllegalStateException("Book is currently unavailable");
         }
 
         if (loanRepository.existsByBookIdAndUserId(book.getId(), user.getId())) {
             throw new IllegalStateException("You have this book on loan");
         }
-
-        book.setAvailableCopies(bookAvailableCopies - 1);
-        book.setCopiesOnLoan(book.getCopiesOnLoan() + 1);
-        bookRepository.save(book);
 
         Loan loan = Loan.builder()
                 .borrowDate(currentDateTime)
@@ -96,16 +89,10 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
-    @Transactional
     public void deleteLoan(final UUID loanId) {
-        Loan loan = loanRepository.findById(loanId)
-                        .orElseThrow(EntityNotFoundException::new);
-        Book book = bookRepository.findById(loan.getBook().getId())
-                        .orElseThrow(EntityNotFoundException::new);
-
+        if (!loanRepository.existsById(loanId)) {
+            throw new EntityNotFoundException("Resource not found");
+        }
         loanRepository.deleteById(loanId);
-        book.setAvailableCopies(book.getAvailableCopies() + 1);
-        book.setCopiesOnLoan(book.getCopiesOnLoan() - 1);
-        bookRepository.save(book);
     }
 }

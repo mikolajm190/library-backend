@@ -1,5 +1,6 @@
 package com.example.library.book.dto;
 
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 
@@ -11,6 +12,7 @@ public record CreateBookRequest(
         String author,
 
         @Min(1)
-        int availableCopies
+        @Max(10)
+        int totalCopies
 ) {
 }

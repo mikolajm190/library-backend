@@ -4,6 +4,7 @@ import com.example.library.loan.Loan;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
+import org.hibernate.annotations.Formula;
 
 import java.util.Set;
 import java.util.UUID;
@@ -14,8 +15,7 @@ import java.util.UUID;
 @Builder
 @Entity
 @Table(name = "book")
-@Check(constraints = "available_copies >= 0")
-@Check(constraints = "copies_on_loan >= 0")
+@Check(constraints = "total_copies >= 0")
 public class Book {
 
     @Id
@@ -28,11 +28,23 @@ public class Book {
     @Column(nullable = false)
     private String author;
 
-    @Column(nullable = false)
-    private int availableCopies;
+    @Column
+    private String description;
 
     @Column(nullable = false)
-    private int copiesOnLoan;
+    private int totalCopies;
+
+    @Formula("""
+            (
+                total_copies -
+                (
+                    SELECT COUNT(*)
+                    FROM loan l
+                    WHERE l.book_id = id
+                )
+            )
+            """)
+    private int availableCopies;
 
     @OneToMany(mappedBy = "book")
     @ToString.Exclude

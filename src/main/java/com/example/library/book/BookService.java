@@ -44,7 +44,7 @@ public class BookService {
         Book book = Book.builder()
                 .title(request.title())
                 .author(request.author())
-                .availableCopies(request.availableCopies())
+                .totalCopies(request.totalCopies())
                 .build();
 
         bookRepository.save(book);
