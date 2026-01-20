@@ -37,6 +37,7 @@ public class User implements UserDetails {
     private Set<Loan> loans;
 
     @Enumerated
+    @Column(nullable = false)
     private Role role;
 
     @Override
