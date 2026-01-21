@@ -4,6 +4,9 @@ import com.example.library.book.Book;
 import com.example.library.book.BookRepository;
 import com.example.library.loan.Loan;
 import com.example.library.loan.LoanRepository;
+import com.example.library.reservation.Reservation;
+import com.example.library.reservation.ReservationRepository;
+import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
 import com.example.library.user.constants.Role;
@@ -23,9 +26,10 @@ import java.util.List;
 @Profile("dev")
 public class DevDataInitializer implements CommandLineRunner {
 
-    private final UserRepository userRepository;
     private final BookRepository bookRepository;
     private final LoanRepository loanRepository;
+    private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Override
@@ -45,6 +49,11 @@ public class DevDataInitializer implements CommandLineRunner {
                         .username("user2")
                         .password(passwordEncoder.encode("pass2"))
                         .role(Role.USER)
+                        .build(),
+                User.builder()
+                        .username("lib")
+                        .password(passwordEncoder.encode("lib456"))
+                        .role(Role.LIBRARIAN)
                         .build()
         );
 
@@ -66,28 +75,47 @@ public class DevDataInitializer implements CommandLineRunner {
                 .orElseThrow(EntityNotFoundException::new);
         Book book1 = bookRepository.findByTitle("Title0")
                 .orElseThrow(EntityNotFoundException::new);
-
-        User user2 = userRepository.findByUsername("user2")
-                .orElseThrow(EntityNotFoundException::new);
         Book book2 = bookRepository.findByTitle("Title1")
                 .orElseThrow(EntityNotFoundException::new);
 
-        LocalDateTime currentDate = LocalDateTime.now();
+        User user2 = userRepository.findByUsername("user2")
+                .orElseThrow(EntityNotFoundException::new);
+        Book book3 = bookRepository.findByTitle("Title2")
+                .orElseThrow(EntityNotFoundException::new);
+
+        LocalDateTime currentTimestamp = LocalDateTime.now();
+        List<Reservation> reservations = List.of(
+                Reservation.builder()
+                        .createdAt(currentTimestamp.minusMinutes(10))
+                        .expiresAt(currentTimestamp.minusMinutes(10).plusDays(3))
+                        .status(ReservationStatus.READY)
+                        .user(user1)
+                        .book(book2)
+                        .build(),
+                Reservation.builder()
+                        .createdAt(currentTimestamp.minusMinutes(5))
+                        .expiresAt(currentTimestamp.minusMinutes(5).plusDays(3))
+                        .status(ReservationStatus.QUEUED)
+                        .user(user2)
+                        .book(book2)
+                        .build()
+        );
         List<Loan> loans = List.of(
                 Loan.builder()
                         .user(user1)
                         .book(book1)
-                        .borrowDate(currentDate.minusDays(15))
-                        .returnDate(currentDate.minusDays(15).plusMonths(1))
+                        .borrowDate(currentTimestamp.minusDays(15))
+                        .returnDate(currentTimestamp.minusDays(15).plusMonths(1))
                         .build(),
                 Loan.builder()
                         .user(user2)
-                        .book(book2)
-                        .borrowDate(currentDate)
-                        .returnDate(currentDate.plusMonths(1))
+                        .book(book3)
+                        .borrowDate(currentTimestamp)
+                        .returnDate(currentTimestamp.plusMonths(1))
                         .build()
         );
 
+        reservationRepository.saveAll(reservations);
         loanRepository.saveAll(loans);
     }
 }
