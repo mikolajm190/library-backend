@@ -1,6 +1,6 @@
 package com.example.library.user.constants;
 
-public enum Role {
+public enum UserRole {
 
     USER,
     LIBRARIAN,

@@ -6,7 +6,7 @@ import com.example.library.auth.dto.RegisterRequest;
 import com.example.library.security.JwtService;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
-import com.example.library.user.constants.Role;
+import com.example.library.user.constants.UserRole;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -27,7 +27,7 @@ public class AuthService {
         User user = User.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.USER)
+                .userRole(UserRole.USER)
                 .build();
         userRepository.save(user);
         String jwtToken = jwtService.generateToken(user);

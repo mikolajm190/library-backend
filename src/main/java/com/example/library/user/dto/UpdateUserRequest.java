@@ -2,7 +2,7 @@ package com.example.library.user.dto;
 
 import jakarta.validation.constraints.NotNull;
 
-public record CreateUpdateUserRequest(
+public record UpdateUserRequest(
         @NotNull
         String username,
 

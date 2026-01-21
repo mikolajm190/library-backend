@@ -9,7 +9,7 @@ import com.example.library.reservation.ReservationRepository;
 import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
-import com.example.library.user.constants.Role;
+import com.example.library.user.constants.UserRole;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
@@ -38,22 +38,22 @@ public class DevDataInitializer implements CommandLineRunner {
                 User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin123"))
-                        .role(Role.ADMIN)
+                        .userRole(UserRole.ADMIN)
                         .build(),
                 User.builder()
                         .username("user1")
                         .password(passwordEncoder.encode("pass1"))
-                        .role(Role.USER)
+                        .userRole(UserRole.USER)
                         .build(),
                 User.builder()
                         .username("user2")
                         .password(passwordEncoder.encode("pass2"))
-                        .role(Role.USER)
+                        .userRole(UserRole.USER)
                         .build(),
                 User.builder()
                         .username("lib")
                         .password(passwordEncoder.encode("lib456"))
-                        .role(Role.LIBRARIAN)
+                        .userRole(UserRole.LIBRARIAN)
                         .build()
         );
 

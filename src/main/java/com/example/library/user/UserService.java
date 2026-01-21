@@ -2,8 +2,8 @@ package com.example.library.user;
 
 import com.example.library.loan.LoanRepository;
 import com.example.library.reservation.ReservationRepository;
-import com.example.library.user.constants.Role;
-import com.example.library.user.dto.CreateUpdateUserRequest;
+import com.example.library.user.constants.UserRole;
+import com.example.library.user.dto.CreateUserRequest;
 import com.example.library.user.dto.UserResponse;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
@@ -43,18 +43,18 @@ public class UserService {
         return mapper.toDto(user);
     }
 
-    public UserResponse createUser(final CreateUpdateUserRequest request) {
+    public UserResponse createUser(final CreateUserRequest request) {
         User user = User.builder()
                 .username(request.username())
                 .password(passwordEncoder.encode(request.password()))
-                .role(Role.USER)
+                .userRole(UserRole.USER)
                 .build();
 
         userRepository.save(user);
         return mapper.toDto(user);
     }
 
-    public UserResponse updateUser(final UUID userId, final CreateUpdateUserRequest request) {
+    public UserResponse updateUser(final UUID userId, final CreateUserRequest request) {
         User user = userRepository.findById(userId)
                 .orElseThrow(EntityNotFoundException::new);
 

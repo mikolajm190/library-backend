@@ -1,6 +1,6 @@
 package com.example.library.user;
 
-import com.example.library.user.dto.CreateUpdateUserRequest;
+import com.example.library.user.dto.CreateUserRequest;
 import com.example.library.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
@@ -47,7 +47,7 @@ public class UserController {
 
     @PostMapping
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody final CreateUpdateUserRequest request) {
+    public ResponseEntity<UserResponse> createUser(@Valid @RequestBody final CreateUserRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(userService.createUser(request));
     }
 
@@ -55,7 +55,7 @@ public class UserController {
     @PreAuthorize("hasRole('ADMIN') or @ownership.isProfileOwner(principal, #userId)")
     public ResponseEntity<UserResponse> updateUser(
             @PathVariable final UUID userId,
-            @Valid @RequestBody final CreateUpdateUserRequest request
+            @Valid @RequestBody final CreateUserRequest request
     ) {
         return ResponseEntity.ok(userService.updateUser(userId, request));
     }

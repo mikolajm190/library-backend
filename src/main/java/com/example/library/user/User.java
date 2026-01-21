@@ -2,7 +2,7 @@ package com.example.library.user;
 
 import com.example.library.loan.Loan;
 import com.example.library.reservation.Reservation;
-import com.example.library.user.constants.Role;
+import com.example.library.user.constants.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -34,7 +34,7 @@ public class User implements UserDetails {
 
     @Enumerated
     @Column(nullable = false)
-    private Role role;
+    private UserRole userRole;
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
@@ -48,7 +48,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + userRole.name()));
     }
 
     @Override
