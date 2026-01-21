@@ -33,41 +33,29 @@ public class LoanController {
             final Authentication authentication
     ) {
         User currentUser = (User) authentication.getPrincipal();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) {
+        boolean canReadOthersLoans = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
+                                                            || "ROLE_LIBRARIAN".equals(a.getAuthority()));
+        if (!canReadOthersLoans) {
             return ResponseEntity.ok(loanService.getAllLoans(page, size, sortBy, sortOrder, currentUser.getId()));
         }
         return ResponseEntity.ok(loanService.getAllLoans(page, size, sortBy, sortOrder));
     }
 
     @GetMapping("/{loanId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isLoanOwner(principal, #loanId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isLoanOwner(principal, #loanId)")
     public ResponseEntity<LoanResponse> getLoan(@PathVariable final UUID loanId) {
         return ResponseEntity.ok(loanService.getLoan(loanId));
     }
 
     @PostMapping
-    public ResponseEntity<LoanResponse> createLoan(
-            @Valid @RequestBody final CreateLoanRequest request,
-            final Authentication authentication
-    ) {
-        User currentUser = (User) authentication.getPrincipal();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin || !currentUser.getId().equals(request.userId())) {
-            return ResponseEntity.status(HttpStatus.CREATED).body(loanService.createLoan(
-                    new CreateLoanRequest(
-                            currentUser.getId(),
-                            request.bookId()
-                    )
-            ));
-        }
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    public ResponseEntity<LoanResponse> createLoan(@Valid @RequestBody final CreateLoanRequest request) {
         return ResponseEntity.status(HttpStatus.CREATED).body(loanService.createLoan(request));
     }
 
     @PutMapping("/{loanId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isLoanOwner(principal, #loanId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isLoanOwner(principal, #loanId)")
     public ResponseEntity<LoanResponse> updateLoan(
             @PathVariable final UUID loanId,
             @Valid @RequestBody final UpdateLoanRequest request
@@ -76,7 +64,7 @@ public class LoanController {
     }
 
     @DeleteMapping("/{loanId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isLoanOwner(principal, #loanId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isLoanOwner(principal, #loanId)")
     public ResponseEntity<?> deleteLoan(@PathVariable final UUID loanId) {
         loanService.deleteLoan(loanId);
         return ResponseEntity.noContent().build();

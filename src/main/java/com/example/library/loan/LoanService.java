@@ -7,6 +7,7 @@ import com.example.library.loan.dto.LoanResponse;
 import com.example.library.loan.dto.UpdateLoanRequest;
 import com.example.library.reservation.Reservation;
 import com.example.library.reservation.ReservationRepository;
+import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -19,6 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -64,11 +66,20 @@ public class LoanService {
                 .orElseThrow(EntityNotFoundException::new);
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(EntityNotFoundException::new);
-        Reservation reservation = reservationRepository.findByUserIdAndBookId(user.getId(), book.getId())
-                .orElseThrow(EntityNotFoundException::new);
+        Optional<Reservation> reservation = reservationRepository.findByUserIdAndBookId(user.getId(), book.getId());
 
         if (loanRepository.existsByBookIdAndUserId(book.getId(), user.getId())) {
             throw new IllegalStateException("User has this book on loan");
+        }
+
+        if (reservation.isPresent()) {
+            if (reservation.get().getStatus() != ReservationStatus.READY) {
+                throw new IllegalStateException("Users reservation is not ready");
+            }
+        } else {
+            if (book.getAvailableCopies() == 0) {
+                throw new IllegalStateException("User has no reservation and book is not available");
+            }
         }
 
         Loan loan = Loan.builder()
@@ -78,7 +89,7 @@ public class LoanService {
                 .book(book)
                 .build();
 
-        reservationRepository.deleteById(reservation.getId());
+        reservation.ifPresent(r -> reservationRepository.deleteById(r.getId()));
         loanRepository.save(loan);
         return mapper.toDto(loan);
     }
