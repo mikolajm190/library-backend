@@ -5,6 +5,7 @@ import com.example.library.book.dto.CreateBookRequest;
 import com.example.library.book.dto.UpdateBookRequest;
 import com.example.library.loan.Loan;
 import com.example.library.loan.LoanRepository;
+import com.example.library.reservation.ReservationRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
@@ -22,6 +23,7 @@ public class BookService {
 
     private final BookRepository bookRepository;
     private final LoanRepository loanRepository;
+    private final ReservationRepository reservationRepository;
     private final BookMapper mapper;
 
     public List<BookResponse> getAllBooks(final int page, final int size, final String sortBy, final String sortOrder) {
@@ -68,6 +70,7 @@ public class BookService {
             throw new EntityNotFoundException("Resource not found");
         }
         loanRepository.deleteByBookId(bookId);
+        reservationRepository.deleteByBookId(bookId);
         bookRepository.deleteById(bookId);
     }
 }

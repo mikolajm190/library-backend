@@ -1,6 +1,7 @@
 package com.example.library.user;
 
 import com.example.library.loan.Loan;
+import com.example.library.reservation.Reservation;
 import com.example.library.user.constants.Role;
 import jakarta.persistence.*;
 import lombok.*;
@@ -31,14 +32,19 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String password;
 
+    @Enumerated
+    @Column(nullable = false)
+    private Role role;
+
+    @OneToMany(mappedBy = "user")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Set<Reservation> reservations;
+
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Set<Loan> loans;
-
-    @Enumerated
-    @Column(nullable = false)
-    private Role role;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

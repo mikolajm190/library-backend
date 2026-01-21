@@ -1,6 +1,7 @@
 package com.example.library.user;
 
 import com.example.library.loan.LoanRepository;
+import com.example.library.reservation.ReservationRepository;
 import com.example.library.user.constants.Role;
 import com.example.library.user.dto.CreateUpdateUserRequest;
 import com.example.library.user.dto.UserResponse;
@@ -20,8 +21,9 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
     private final LoanRepository loanRepository;
+    private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
     private final UserMapper mapper;
     private final PasswordEncoder passwordEncoder;
 
@@ -69,6 +71,7 @@ public class UserService {
             throw new EntityNotFoundException("Resource not found");
         }
         loanRepository.deleteByUserId(userId);
+        reservationRepository.deleteByUserId(userId);
         userRepository.deleteById(userId);
     }
 }

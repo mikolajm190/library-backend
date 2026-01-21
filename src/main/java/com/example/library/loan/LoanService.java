@@ -5,6 +5,8 @@ import com.example.library.book.BookRepository;
 import com.example.library.loan.dto.CreateLoanRequest;
 import com.example.library.loan.dto.LoanResponse;
 import com.example.library.loan.dto.UpdateLoanRequest;
+import com.example.library.reservation.Reservation;
+import com.example.library.reservation.ReservationRepository;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
@@ -13,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -22,9 +25,10 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class LoanService {
 
-    private final LoanRepository loanRepository;
-    private final UserRepository userRepository;
     private final BookRepository bookRepository;
+    private final LoanRepository loanRepository;
+    private final ReservationRepository reservationRepository;
+    private final UserRepository userRepository;
     private final LoanMapper mapper;
 
     public List<LoanResponse> getAllLoans(final int page, final int size, final String sortBy, final String sortOrder) {
@@ -53,19 +57,18 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
+    @Transactional
     public LoanResponse createLoan(final CreateLoanRequest request) {
         LocalDateTime currentDateTime = LocalDateTime.now();
         User user = userRepository.findById(request.userId())
                 .orElseThrow(EntityNotFoundException::new);
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(EntityNotFoundException::new);
-
-        if (book.getAvailableCopies() == 0) {
-            throw new IllegalStateException("Book is currently unavailable");
-        }
+        Reservation reservation = reservationRepository.findByUserIdAndBookId(user.getId(), book.getId())
+                .orElseThrow(EntityNotFoundException::new);
 
         if (loanRepository.existsByBookIdAndUserId(book.getId(), user.getId())) {
-            throw new IllegalStateException("You have this book on loan");
+            throw new IllegalStateException("User has this book on loan");
         }
 
         Loan loan = Loan.builder()
@@ -75,6 +78,7 @@ public class LoanService {
                 .book(book)
                 .build();
 
+        reservationRepository.deleteById(reservation.getId());
         loanRepository.save(loan);
         return mapper.toDto(loan);
     }
