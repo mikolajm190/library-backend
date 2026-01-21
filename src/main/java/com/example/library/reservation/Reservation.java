@@ -1,6 +1,7 @@
 package com.example.library.reservation;
 
 import com.example.library.book.Book;
+import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.user.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -25,6 +26,10 @@ public class Reservation {
 
     @Column(nullable = false)
     private LocalDateTime expiresAt;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private ReservationStatus status;
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
