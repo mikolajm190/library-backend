@@ -32,16 +32,17 @@ public class ReservationController {
             final Authentication authentication
     ) {
         User currentUser = (User) authentication.getPrincipal();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin) {
+        boolean canReadOthersReservations = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
+                                                        || "ROLE_LIBRARIAN".equals(a.getAuthority()));
+        if (!canReadOthersReservations) {
             return ResponseEntity.ok(reservationService.getAllReservations(page, size, sortBy, sortOrder, currentUser.getId()));
         }
         return ResponseEntity.ok(reservationService.getAllReservations(page, size, sortBy, sortOrder));
     }
 
     @GetMapping("/{reservationId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isLoanOwner(principal, #reservationId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isReservationOwner(principal, #reservationId)")
     public ResponseEntity<ReservationResponse> getReservation(@PathVariable final UUID loanId) {
         return ResponseEntity.ok(reservationService.getReservation(loanId));
     }
@@ -52,9 +53,10 @@ public class ReservationController {
             final Authentication authentication
     ) {
         User currentUser = (User) authentication.getPrincipal();
-        boolean isAdmin = authentication.getAuthorities().stream()
-                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
-        if (!isAdmin || !currentUser.getId().equals(request.userId())) {
+        boolean canModifyOthersReservations = authentication.getAuthorities().stream()
+                .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
+                                                            || "ROLE_LIBRARIAN".equals(a.getAuthority()));
+        if (!canModifyOthersReservations || !currentUser.getId().equals(request.userId())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(
                     new CreateReservationRequest(
                             currentUser.getId(),
@@ -66,9 +68,16 @@ public class ReservationController {
     }
 
     @DeleteMapping("/{reservationId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isLoanOwner(principal, #reservationId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isReservationOwner(principal, #reservationId)")
     public ResponseEntity<?> deleteReservation(@PathVariable final UUID loanId) {
         reservationService.deleteReservation(loanId);
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/expired")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    public ResponseEntity<?> deleteExpiredReservations() {
+        reservationService.deleteExpiredReservations();
         return ResponseEntity.noContent().build();
     }
 }

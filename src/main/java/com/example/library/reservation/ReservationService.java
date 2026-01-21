@@ -2,6 +2,7 @@ package com.example.library.reservation;
 
 import com.example.library.book.Book;
 import com.example.library.book.BookRepository;
+import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.reservation.dto.CreateReservationRequest;
 import com.example.library.reservation.dto.ReservationResponse;
 import com.example.library.user.User;
@@ -12,6 +13,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -58,18 +60,23 @@ public class ReservationService {
         Book book = bookRepository.findById(request.bookId())
                 .orElseThrow(EntityNotFoundException::new);
 
-        if (book.getAvailableCopies() == 0) {
-            throw new IllegalStateException("Book is currently unavailable");
-        }
-
         if (reservationRepository.existsByUserIdAndBookId(user.getId(), book.getId())) {
-            throw new IllegalStateException("You have a pending reservation for this book");
+            throw new IllegalStateException("User has a pending reservation for this book");
         }
 
         LocalDateTime currentTimestamp = LocalDateTime.now();
+        boolean bookHasAvailableCopies = book.getAvailableCopies() > 0;
+        LocalDateTime expiryTimestamp = bookHasAvailableCopies
+                ? currentTimestamp.plusDays(3)
+                : currentTimestamp.plusMonths(3);
+        ReservationStatus status = bookHasAvailableCopies
+                ? ReservationStatus.READY
+                : ReservationStatus.QUEUED;
+
         Reservation reservation = Reservation.builder()
                 .createdAt(currentTimestamp)
-                .expiresAt(currentTimestamp.plusDays(3))
+                .expiresAt(expiryTimestamp)
+                .status(status)
                 .build();
 
         reservationRepository.save(reservation);
@@ -81,5 +88,24 @@ public class ReservationService {
             throw new EntityNotFoundException("Resource not found");
         }
         reservationRepository.deleteById(reservationId);
+    }
+
+    @Transactional
+    public void deleteExpiredReservations() {
+        LocalDateTime currentTimestamp = LocalDateTime.now();
+        reservationRepository.deleteExpiredReservations(ReservationStatus.QUEUED, currentTimestamp);
+        final List<UUID> bookIds = reservationRepository.findBookIdsWithExpiredReservations(ReservationStatus.READY, currentTimestamp);
+        reservationRepository.deleteExpiredReservations(ReservationStatus.READY, currentTimestamp);
+
+        for (UUID bookId: bookIds) {
+            processBookQueue(bookId, currentTimestamp);
+        }
+    }
+
+    private int processBookQueue(final UUID bookId, final LocalDateTime currentTimestamp) {
+        Book book = bookRepository.findById(bookId)
+                .orElseThrow(EntityNotFoundException::new);
+
+        return reservationRepository.updateStatusForQueuedReservations(bookId, book.getAvailableCopies(), currentTimestamp);
     }
 }
