@@ -45,7 +45,7 @@ public class Book {
                 ) -
                 (
                     SELECT COUNT(*)
-                    FROM reservations r
+                    FROM reservation r
                     WHERE r.book_id = id
                     AND r.status = 'READY'
                     AND r.expires_at > CURRENT_TIMESTAMP
@@ -55,10 +55,12 @@ public class Book {
     private int availableCopies;
 
     @Formula("""
-            SELECT COUNT(*)
-            FROM reservations r
-            WHERE r.book_id = id
-            AND r.status = 'QUEUED'
+            (
+                SELECT COUNT(*)
+                FROM reservation r
+                WHERE r.book_id = id
+                AND r.status = 'QUEUED'
+            )
             """)
     private int queueSize;
 

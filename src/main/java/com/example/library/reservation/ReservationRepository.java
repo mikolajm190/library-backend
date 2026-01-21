@@ -17,7 +17,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     Optional<Reservation> findByUserIdAndBookId(UUID userId, UUID bookId);
     List<Reservation> findAllByUserId(UUID userId, Pageable pageable);
 
-    @Query("SELECT DISTINCT r.bookId FROM Reservations r WHERE r.status = :status AND r.expiresAt < :now")
+    @Query("SELECT DISTINCT r.book.id FROM Reservation r WHERE r.status = :status AND r.expiresAt < :now")
     List<UUID> findBookIdsWithExpiredReservations(@Param("status") ReservationStatus status, @Param("now") LocalDateTime now);
 
     @Modifying
@@ -39,11 +39,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
                                            @Param("newExpiry") LocalDateTime newExpiry);
 
     @Modifying
-    @Query("DELETE FROM Reservations r WHERE r.userId = :userId")
+    @Query("DELETE FROM Reservation r WHERE r.user.id = :userId")
     void deleteByUserId(@Param("userId") UUID userId);
 
     @Modifying
-    @Query("DELETE FROM Reservations r WHERE r.bookId = :bookId")
+    @Query("DELETE FROM Reservation r WHERE r.book.id = :bookId")
     void deleteByBookId(@Param("bookId") UUID bookId);
 
     @Modifying

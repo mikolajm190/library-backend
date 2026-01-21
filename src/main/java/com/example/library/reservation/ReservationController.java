@@ -27,7 +27,7 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponse>> getAllReservations(
             @RequestParam(defaultValue = "0") @Min(0) final int page,
             @RequestParam(defaultValue = "10") @Min(1) final int size,
-            @RequestParam(defaultValue = "returnDate") @Pattern(regexp = "returnDate") final String sortBy,
+            @RequestParam(defaultValue = "createdAt") @Pattern(regexp = "createdAt") final String sortBy,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder,
             final Authentication authentication
     ) {
