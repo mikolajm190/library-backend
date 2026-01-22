@@ -83,11 +83,14 @@ public class ReservationService {
         return mapper.toDto(reservation);
     }
 
+    @Transactional
     public void deleteReservation(final UUID reservationId) {
-        if (!reservationRepository.existsById(reservationId)) {
-            throw new EntityNotFoundException("Resource not found");
-        }
+        final UUID bookId = reservationRepository.findById(reservationId)
+                .orElseThrow(EntityNotFoundException::new)
+                .getBook()
+                .getId();
         reservationRepository.deleteById(reservationId);
+        processBookQueue(bookId, LocalDateTime.now());
     }
 
     @Transactional
