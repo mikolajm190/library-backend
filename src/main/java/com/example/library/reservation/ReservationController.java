@@ -43,8 +43,8 @@ public class ReservationController {
 
     @GetMapping("/{reservationId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isReservationOwner(principal, #reservationId)")
-    public ResponseEntity<ReservationResponse> getReservation(@PathVariable final UUID loanId) {
-        return ResponseEntity.ok(reservationService.getReservation(loanId));
+    public ResponseEntity<ReservationResponse> getReservation(@PathVariable final UUID reservationId) {
+        return ResponseEntity.ok(reservationService.getReservation(reservationId));
     }
 
     @PostMapping
@@ -69,8 +69,8 @@ public class ReservationController {
 
     @DeleteMapping("/{reservationId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isReservationOwner(principal, #reservationId)")
-    public ResponseEntity<?> deleteReservation(@PathVariable final UUID loanId) {
-        reservationService.deleteReservation(loanId);
+    public ResponseEntity<?> deleteReservation(@PathVariable final UUID reservationId) {
+        reservationService.deleteReservation(reservationId);
         return ResponseEntity.noContent().build();
     }
 
