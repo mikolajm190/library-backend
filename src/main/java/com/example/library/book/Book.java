@@ -54,16 +54,6 @@ public class Book {
             """)
     private int availableCopies;
 
-    @Formula("""
-            (
-                SELECT COUNT(*)
-                FROM reservation r
-                WHERE r.book_id = id
-                AND r.status = 'QUEUED'
-            )
-            """)
-    private int queueSize;
-
     @OneToMany(mappedBy = "book")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
