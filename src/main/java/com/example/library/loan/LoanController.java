@@ -64,7 +64,7 @@ public class LoanController {
     }
 
     @DeleteMapping("/{loanId}")
-    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isLoanOwner(principal, #loanId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<?> deleteLoan(@PathVariable final UUID loanId) {
         loanService.deleteLoan(loanId);
         return ResponseEntity.noContent().build();
