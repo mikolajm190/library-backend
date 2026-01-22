@@ -92,6 +92,7 @@ public class ReservationService {
                 .getBook()
                 .getId();
         reservationRepository.deleteById(reservationId);
+        reservationRepository.flush();
         processBookQueue(bookId, LocalDateTime.now());
     }
 
@@ -99,8 +100,10 @@ public class ReservationService {
     public void deleteExpiredReservations() {
         LocalDateTime currentTimestamp = LocalDateTime.now();
         reservationRepository.deleteExpiredReservations(ReservationStatus.QUEUED, currentTimestamp);
+        reservationRepository.flush();
         final List<UUID> bookIds = reservationRepository.findBookIdsWithExpiredReservations(ReservationStatus.READY, currentTimestamp);
         reservationRepository.deleteExpiredReservations(ReservationStatus.READY, currentTimestamp);
+        reservationRepository.flush();
 
         for (UUID bookId: bookIds) {
             processBookQueue(bookId, currentTimestamp);
@@ -108,9 +111,10 @@ public class ReservationService {
     }
 
     private int processBookQueue(final UUID bookId, final LocalDateTime currentTimestamp) {
-        Book book = bookRepository.findById(bookId)
-                .orElseThrow(EntityNotFoundException::new);
-
-        return reservationRepository.updateStatusForQueuedReservations(bookId, book.getAvailableCopies(), currentTimestamp);
+        return reservationRepository.updateStatusForQueuedReservations(
+                bookId,
+                bookRepository.getBookAvailability(bookId),
+                currentTimestamp
+        );
     }
 }

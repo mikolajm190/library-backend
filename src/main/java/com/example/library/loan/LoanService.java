@@ -104,10 +104,18 @@ public class LoanService {
         return mapper.toDto(loan);
     }
 
+    @Transactional
     public void deleteLoan(final UUID loanId) {
-        if (!loanRepository.existsById(loanId)) {
-            throw new EntityNotFoundException("Resource not found");
-        }
+        UUID bookId = loanRepository.findById(loanId)
+                .orElseThrow(EntityNotFoundException::new)
+                .getBook()
+                .getId();
         loanRepository.deleteById(loanId);
+        loanRepository.flush();
+        reservationRepository.updateStatusForQueuedReservations(
+                bookId,
+                bookRepository.getBookAvailability(bookId),
+                LocalDateTime.now().plusDays(3)
+        );
     }
 }
