@@ -23,7 +23,7 @@ public class UserController {
     private final UserService userService;
 
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN')")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
     public ResponseEntity<List<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") @Min(0) final int page,
             @RequestParam(defaultValue = "10") @Min(1) final int size,
@@ -40,7 +40,7 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @PreAuthorize("hasRole('ADMIN') or @ownership.isProfileOwner(principal, #userId)")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isProfileOwner(principal, #userId)")
     public ResponseEntity<UserResponse> getUser(@PathVariable final UUID userId) {
         return ResponseEntity.ok(userService.getUser(userId));
     }
