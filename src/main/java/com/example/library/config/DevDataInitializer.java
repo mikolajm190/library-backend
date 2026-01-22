@@ -82,6 +82,8 @@ public class DevDataInitializer implements CommandLineRunner {
                 .orElseThrow(EntityNotFoundException::new);
         Book book3 = bookRepository.findByTitle("Title2")
                 .orElseThrow(EntityNotFoundException::new);
+        Book book4 = bookRepository.findByTitle("Title3")
+                .orElseThrow(EntityNotFoundException::new);
 
         LocalDateTime currentTimestamp = LocalDateTime.now();
         List<Reservation> reservations = List.of(
@@ -98,6 +100,20 @@ public class DevDataInitializer implements CommandLineRunner {
                         .status(ReservationStatus.QUEUED)
                         .user(user2)
                         .book(book3)
+                        .build(),
+                Reservation.builder()
+                        .createdAt(currentTimestamp.minusDays(4))
+                        .expiresAt(currentTimestamp.minusDays(1))
+                        .status(ReservationStatus.READY)
+                        .user(user2)
+                        .book(book4)
+                        .build(),
+                Reservation.builder()
+                        .createdAt(currentTimestamp.minusDays(2).plusMinutes(15))
+                        .expiresAt(currentTimestamp.plusDays(1).plusMinutes(15))
+                        .status(ReservationStatus.QUEUED)
+                        .user(user1)
+                        .book(book4)
                         .build()
         );
         List<Loan> loans = List.of(
