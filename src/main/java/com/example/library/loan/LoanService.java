@@ -74,7 +74,7 @@ public class LoanService {
 
         if (reservation.isPresent()) {
             if (reservation.get().getStatus() != ReservationStatus.READY) {
-                throw new IllegalStateException("Users reservation is not ready");
+                throw new IllegalStateException("User reservation is not ready");
             }
         } else {
             if (book.getAvailableCopies() == 0) {
