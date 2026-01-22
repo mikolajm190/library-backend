@@ -23,14 +23,14 @@ public interface ReservationRepository extends JpaRepository<Reservation, UUID> 
     @Modifying
     @Query(value = """
             UPDATE reservation
-            SET status = 'READY'
+            SET status = 'READY',
                 expires_at = :newExpiry
             WHERE id IN (
                 SELECT r.id
                 FROM reservation r
                 WHERE r.book_id = :bookId
                 AND r.status = 'QUEUED'
-                ORDER BY r.createdAt ASC
+                ORDER BY r.created_at ASC
                 LIMIT :limit
                 )
             """, nativeQuery = true)
