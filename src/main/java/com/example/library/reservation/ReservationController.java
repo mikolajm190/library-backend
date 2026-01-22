@@ -56,7 +56,7 @@ public class ReservationController {
         boolean canModifyOthersReservations = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
                                                             || "ROLE_LIBRARIAN".equals(a.getAuthority()));
-        if (!canModifyOthersReservations || !currentUser.getId().equals(request.userId())) {
+        if (!canModifyOthersReservations && !currentUser.getId().equals(request.userId())) {
             return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(
                     new CreateReservationRequest(
                             currentUser.getId(),
