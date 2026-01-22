@@ -90,14 +90,14 @@ public class DevDataInitializer implements CommandLineRunner {
                         .expiresAt(currentTimestamp.minusMinutes(10).plusDays(3))
                         .status(ReservationStatus.READY)
                         .user(user1)
-                        .book(book2)
+                        .book(book3)
                         .build(),
                 Reservation.builder()
                         .createdAt(currentTimestamp.minusMinutes(5))
-                        .expiresAt(currentTimestamp.minusMinutes(5).plusDays(3))
+                        .expiresAt(currentTimestamp.minusMinutes(5).plusMonths(3))
                         .status(ReservationStatus.QUEUED)
                         .user(user2)
-                        .book(book2)
+                        .book(book3)
                         .build()
         );
         List<Loan> loans = List.of(
@@ -109,7 +109,7 @@ public class DevDataInitializer implements CommandLineRunner {
                         .build(),
                 Loan.builder()
                         .user(user2)
-                        .book(book3)
+                        .book(book2)
                         .borrowDate(currentTimestamp)
                         .returnDate(currentTimestamp.plusMonths(1))
                         .build()
