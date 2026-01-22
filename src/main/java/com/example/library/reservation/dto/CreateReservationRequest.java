@@ -6,9 +6,9 @@ import java.util.UUID;
 
 public record CreateReservationRequest(
         @NotNull
-        UUID bookId,
+        UUID userId,
 
         @NotNull
-        UUID userId
+        UUID bookId
 ) {
 }

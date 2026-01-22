@@ -77,6 +77,8 @@ public class ReservationService {
                 .createdAt(currentTimestamp)
                 .expiresAt(expiryTimestamp)
                 .status(status)
+                .user(user)
+                .book(book)
                 .build();
 
         reservationRepository.save(reservation);
