@@ -34,7 +34,7 @@ public class User implements UserDetails {
 
     @Enumerated
     @Column(nullable = false)
-    private UserRole userRole;
+    private UserRole role;
 
     @OneToMany(mappedBy = "user")
     @ToString.Exclude
@@ -48,7 +48,7 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + userRole.name()));
+        return List.of(new SimpleGrantedAuthority("ROLE_" + role.name()));
     }
 
     @Override

@@ -38,22 +38,22 @@ public class DevDataInitializer implements CommandLineRunner {
                 User.builder()
                         .username("admin")
                         .password(passwordEncoder.encode("admin123"))
-                        .userRole(UserRole.ADMIN)
+                        .role(UserRole.ADMIN)
                         .build(),
                 User.builder()
                         .username("user1")
                         .password(passwordEncoder.encode("pass1"))
-                        .userRole(UserRole.USER)
+                        .role(UserRole.USER)
                         .build(),
                 User.builder()
                         .username("user2")
                         .password(passwordEncoder.encode("pass2"))
-                        .userRole(UserRole.USER)
+                        .role(UserRole.USER)
                         .build(),
                 User.builder()
                         .username("lib")
                         .password(passwordEncoder.encode("lib456"))
-                        .userRole(UserRole.LIBRARIAN)
+                        .role(UserRole.LIBRARIAN)
                         .build()
         );
 

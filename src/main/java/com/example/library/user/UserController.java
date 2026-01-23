@@ -27,7 +27,7 @@ public class UserController {
     public ResponseEntity<List<UserResponse>> getAllUsers(
             @RequestParam(defaultValue = "0") @Min(0) final int page,
             @RequestParam(defaultValue = "10") @Min(1) final int size,
-            @RequestParam(defaultValue = "username") @Pattern(regexp = "username") final String sortBy,
+            @RequestParam(defaultValue = "username") @Pattern(regexp = "username|role") final String sortBy,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder
     ) {
         return ResponseEntity.ok(userService.getAllUsers(page, size, sortBy, sortOrder));
