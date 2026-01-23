@@ -26,7 +26,7 @@ public class BookController {
     public ResponseEntity<List<BookResponse>> getAllBooks(
             @RequestParam(defaultValue = "0") @Min(0) final int page,
             @RequestParam(defaultValue = "10") @Min(1) final int size,
-            @RequestParam(defaultValue = "title") @Pattern(regexp = "title") final String sortBy,
+            @RequestParam(defaultValue = "title") @Pattern(regexp = "title|author|totalCopies") final String sortBy,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder
     ) {
         return ResponseEntity.ok(bookService.getAllBooks(page, size, sortBy, sortOrder));
