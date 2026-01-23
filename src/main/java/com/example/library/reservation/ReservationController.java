@@ -1,6 +1,7 @@
 package com.example.library.reservation;
 
 import com.example.library.reservation.dto.CreateReservationRequest;
+import com.example.library.reservation.dto.ReservationBatchProcessingResponse;
 import com.example.library.reservation.dto.ReservationResponse;
 import com.example.library.user.User;
 import jakarta.validation.Valid;
@@ -27,7 +28,7 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponse>> getAllReservations(
             @RequestParam(defaultValue = "0") @Min(0) final int page,
             @RequestParam(defaultValue = "10") @Min(1) final int size,
-            @RequestParam(defaultValue = "createdAt") @Pattern(regexp = "createdAt") final String sortBy,
+            @RequestParam(defaultValue = "createdAt") @Pattern(regexp = "createdAt|expiresAt|status|user\\.username|book\\.title") final String sortBy,
             @RequestParam(defaultValue = "desc") @Pattern(regexp = "ASC|DESC", flags = Pattern.Flag.CASE_INSENSITIVE) final String sortOrder,
             final Authentication authentication
     ) {
@@ -35,10 +36,12 @@ public class ReservationController {
         boolean canReadOthersReservations = authentication.getAuthorities().stream()
                 .anyMatch(a -> "ROLE_ADMIN".equals(a.getAuthority())
                                                         || "ROLE_LIBRARIAN".equals(a.getAuthority()));
-        if (!canReadOthersReservations) {
-            return ResponseEntity.ok(reservationService.getAllReservations(page, size, sortBy, sortOrder, currentUser.getId()));
-        }
-        return ResponseEntity.ok(reservationService.getAllReservations(page, size, sortBy, sortOrder));
+
+        List<ReservationResponse> reservations = canReadOthersReservations
+                ? reservationService.getAllReservations(page, size, sortBy, sortOrder)
+                : reservationService.getAllReservations(page, size, sortBy, sortOrder, currentUser.getId());
+
+        return ResponseEntity.ok(reservations);
     }
 
     @GetMapping("/{reservationId}")
@@ -67,6 +70,12 @@ public class ReservationController {
         return ResponseEntity.status(HttpStatus.CREATED).body(reservationService.createReservation(request));
     }
 
+    @PostMapping("/expire")
+    @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
+    public ResponseEntity<ReservationBatchProcessingResponse> setExpiredReservationsStatus() {
+        return ResponseEntity.ok(reservationService.setExpiredReservationStatus());
+    }
+
     @DeleteMapping("/{reservationId}")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN') or @ownership.isReservationOwner(principal, #reservationId)")
     public ResponseEntity<?> deleteReservation(@PathVariable final UUID reservationId) {
@@ -76,8 +85,8 @@ public class ReservationController {
 
     @DeleteMapping("/expired")
     @PreAuthorize("hasRole('ADMIN') or hasRole('LIBRARIAN')")
-    public ResponseEntity<?> deleteExpiredReservations() {
-        reservationService.deleteExpiredReservations();
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ReservationBatchProcessingResponse> deleteExpiredReservations() {
+        reservationService.setExpiredReservationStatus();
+        return ResponseEntity.ok(reservationService.deleteExpiredReservations());
     }
 }

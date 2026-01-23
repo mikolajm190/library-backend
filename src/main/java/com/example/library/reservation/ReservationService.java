@@ -4,6 +4,7 @@ import com.example.library.book.Book;
 import com.example.library.book.BookRepository;
 import com.example.library.reservation.constant.ReservationStatus;
 import com.example.library.reservation.dto.CreateReservationRequest;
+import com.example.library.reservation.dto.ReservationBatchProcessingResponse;
 import com.example.library.reservation.dto.ReservationResponse;
 import com.example.library.user.User;
 import com.example.library.user.UserRepository;
@@ -29,7 +30,8 @@ public class ReservationService {
     private final ReservationMapper mapper;
 
     public List<ReservationResponse> getAllReservations(final int page, final int size, final String sortBy, final String sortOrder) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy)
+                .and(Sort.by(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page, size, sort);
         return reservationRepository
                 .findAll(pageable)
@@ -39,7 +41,8 @@ public class ReservationService {
     }
 
     public List<ReservationResponse> getAllReservations(final int page, final int size, final String sortBy, final String sortOrder, final UUID userId) {
-        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy);
+        Sort sort = Sort.by(Sort.Direction.fromString(sortOrder), sortBy)
+                .and(Sort.by(Sort.Direction.DESC, "createdAt"));
         Pageable pageable = PageRequest.of(page, size, sort);
         return reservationRepository
                 .findAllByUserId(userId, pageable)
@@ -97,17 +100,17 @@ public class ReservationService {
     }
 
     @Transactional
-    public void deleteExpiredReservations() {
-        LocalDateTime currentTimestamp = LocalDateTime.now();
-        reservationRepository.deleteExpiredReservations(ReservationStatus.QUEUED, currentTimestamp);
-        reservationRepository.flush();
-        final List<UUID> bookIds = reservationRepository.findBookIdsWithExpiredReservations(ReservationStatus.READY, currentTimestamp);
-        reservationRepository.deleteExpiredReservations(ReservationStatus.READY, currentTimestamp);
+    public ReservationBatchProcessingResponse deleteExpiredReservations() {
+        final List<UUID> bookIds = reservationRepository.findBookIdsWithExpiredReadyReservations();
+        reservationRepository.deleteReservationsByStatus(ReservationStatus.EXPIRED);
         reservationRepository.flush();
 
+        int rowCount = 0;
         for (UUID bookId: bookIds) {
-            processBookQueue(bookId, currentTimestamp);
+            rowCount += processBookQueue(bookId, LocalDateTime.now().plusDays(3));
         }
+
+        return new ReservationBatchProcessingResponse(rowCount);
     }
 
     private int processBookQueue(final UUID bookId, final LocalDateTime currentTimestamp) {
@@ -116,5 +119,10 @@ public class ReservationService {
                 bookRepository.getBookAvailability(bookId),
                 currentTimestamp
         );
+    }
+
+    @Transactional
+    public ReservationBatchProcessingResponse setExpiredReservationStatus() {
+        return new ReservationBatchProcessingResponse(reservationRepository.updateStatusForExpiredReservations());
     }
 }
