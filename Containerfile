@@ -1,7 +1,7 @@
 FROM docker.io/library/maven:3.9.12-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
-RUN mvn -B -DskipTests dependecy:go-offline
+RUN mvn -B -DskipTests dependency:go-offline
 COPY src ./src
 RUN mvn -B package -DskipTests
 
